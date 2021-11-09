@@ -77,3 +77,5 @@ def anime_searcher(user_query):
         return return_this
 
 
+x = anime_searcher("pokemon")
+print(x[0]['Rating'])

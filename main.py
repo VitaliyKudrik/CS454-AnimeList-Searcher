@@ -38,13 +38,13 @@ def search(anime):
 
 
 # Show the actual anime results. Hasn't been made presentable yet
-@app.route('/result/<anime>')
+@app.route('/result/<anime>/<page>')
 def test_search(anime):
     results = anime_searcher(anime)
     pics = []
     for pic in results:
         pics.append(pic['Picture'])
-    return render_template('result.html', name=anime, results=results, pics=pics)
+    return render_template('result.html', name=anime, results=results, pics=pics, page=page)
 
 
 if __name__ == "__main__":

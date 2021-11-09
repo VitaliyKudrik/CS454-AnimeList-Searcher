@@ -9,3 +9,9 @@ sortedby
 
 Edit distance is like this: "Gedsxs[tilde]2" using the ~ for editdistance and a number for how much of a distance.
 "Gedsxs[tilde]2" would translate to "Geass" for "Code Geass"
+
+When creating the index I created "True" copies of data that will be shown to the user so that I can keep more refined data for actual searching.
+By this I mean that I used stop words for description, which means I needed to save one version of description with stopping and one without so that I can show users.
+
+I also used True copies for rating and episode count and air date. This is because some ratings have 99999 values because they were unrated.
+Similar reasons for air date and episode count, so I fixed those fillers with True data which is just text that says the proper data.
