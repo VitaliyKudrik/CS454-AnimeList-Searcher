@@ -1,10 +1,15 @@
-from whoosh import index, qparser
-from whoosh.fields import Schema, TEXT, KEYWORD, DATETIME, NUMERIC
+from whoosh import qparser
 from whoosh.qparser import MultifieldParser, FuzzyTermPlugin
 from whoosh.index import open_dir
-import os
 import pandas as pd
-import datetime
+
+
+"""
+This Searcher will search through the whoosh index that was created by the indexer.
+It will provide back data in a form similar to dictionaries if you use the .fields() command on 
+the returned results from anime_searcher. To search just type any query you like in string format.
+By: Vitaliy Kudrik
+"""
 
 
 # This just opens the csv file for reading when creating the index.
@@ -44,14 +49,15 @@ def anime_searcher(user_query):
         # This was added to get some edit distance in our searching just in case users mistype
         # I'm not using it in this code directly but a user can type ~ after a word and have an edit distance
         multiparser.add_plugin(FuzzyTermPlugin())
-        question_str = user_query
-
+        question_str = user_query.lower()
+        print("My query = {}".format(user_query))
         # These are ways to restrict certain results or to filter for certain results, not used here for now
         # # restrict_q = Term("Title", "")
         # # allow_q = Term("Title", "")
 
         # Parse the question
         user_question = multiparser.parse(question_str)
+        print(user_question.all_terms(), "\n\n")
         # Search the question
         results = searcher.search(user_question, limit=results_limit)
 
@@ -69,4 +75,5 @@ def anime_searcher(user_query):
             results_counter -= 1
         # Return the list of anime
         return return_this
+
 

@@ -17,9 +17,9 @@ def homepage():
         data = request.args
         x = data.get('search')
         print(data)
-        x = x.strip()
         # Deal with bad user input or no input
         if x is not None and x != "":
+            x = x.strip()
             # Send you to the anime you want to see
             return redirect(f'/search/{x}')
 
@@ -33,8 +33,20 @@ def search(anime):
     pics = []
     for pic in results:
         pics.append(pic['Picture'])
-    return render_template('search.html', name=anime, results=results, pics=pics)
+
+    return render_template('result.html', name=anime, results=results, pics=pics)
+
+
+# Show the actual anime results. Hasn't been made presentable yet
+@app.route('/result/<anime>')
+def test_search(anime):
+    results = anime_searcher(anime)
+    pics = []
+    for pic in results:
+        pics.append(pic['Picture'])
+    return render_template('result.html', name=anime, results=results, pics=pics)
 
 
 if __name__ == "__main__":
     app.run(debug=True)
+
