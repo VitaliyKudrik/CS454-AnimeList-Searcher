@@ -2,7 +2,7 @@ from whoosh import qparser
 from whoosh.qparser import MultifieldParser, FuzzyTermPlugin
 from whoosh.index import open_dir
 import pandas as pd
-
+from math import ceil
 
 """
 This Searcher will search through the whoosh index that was created by the indexer.
@@ -50,14 +50,12 @@ def anime_searcher(user_query):
         # I'm not using it in this code directly but a user can type ~ after a word and have an edit distance
         multiparser.add_plugin(FuzzyTermPlugin())
         question_str = user_query.lower()
-        print("My query = {}".format(user_query))
         # These are ways to restrict certain results or to filter for certain results, not used here for now
         # # restrict_q = Term("Title", "")
         # # allow_q = Term("Title", "")
 
         # Parse the question
         user_question = multiparser.parse(question_str)
-        print(user_question.all_terms(), "\n\n")
         # Search the question
         results = searcher.search(user_question, limit=results_limit)
 
@@ -76,6 +74,3 @@ def anime_searcher(user_query):
         # Return the list of anime
         return return_this
 
-
-x = anime_searcher("pokemon")
-print(x[0]['Rating'])

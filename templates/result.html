@@ -1,8 +1,8 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
             integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
 <style>
-  #background_pic {
-  background: url("../static/images/results_bg1.jpg") no-repeat fixed;
+#background_pic {
+  background: url("/static/images/results_bg1.jpg") no-repeat fixed;
   -webkit-background-size: cover;
   -moz-background-size: cover;
   -o-background-size: cover;
@@ -17,9 +17,6 @@
     <div class="col-md-12">
       <div class="grid search">
         <div class="grid-body">
-          <div class="row">
-
-            </div>
             <!-- BEGIN RESULT -->
             <div class="col" style="background: rgba(255, 255, 255, 0.5)">
               <h2 style="padding-left: 15px; font-family: Harrington;font-weight: bold; text-align: center;
@@ -60,25 +57,26 @@
                     <td>Air Date </td>
                   </tr>
                   <!-- For loop to make top 10 anime show up -->
-                  {% for num in range(0, 10): %}
+                  {% for num in range(0, curr_page_len): %}
                     {% if results|length > num: %}
+                      {% if pages > i_page: %}
                     <tr>
                         <!-- This shows the rank of the anime -->
-                        <td class="number text-center">{{num + 1}}</td>
+                        <td class="number text-center">{{(i_page)*10 + num + 1}}</td>
                         <!-- This shows the image of the anime -->
-                        <td class="image"><img src="{{pics[num]}}" alt="" height="200" width="150"></td>
+                        <td class="image"><img src="{{results[page][num]['Picture']}}" alt="" height="200" width="150"></td>
                         <!-- This shows the title of the anime -->
-                        <td class="product"><a href='{{results[num]["Link"]}}'>{{results[num]['True_title']}}</a> </td>
+                        <td class="product"><a href='{{results[page][num]["Link"]}}'>{{results[page][num]['True_title']}}</a> </td>
                         <!-- This shows the description of the anime -->
-                        <td class="pt4">{{results[num]["True_description"]}}</td>
+                        <td class="pt4">{{results[page][num]["True_description"]}}</td>
                       <td class="borderClass ac bgColor0" width="80">
-                        {{results[num]['True_rating']}}
+                        {{results[page][num]['True_rating']}}
                       </td>
                       <td class="borderClass ac bgColor0" width="120">
-                        {{results[num]["True_date"]}}
+                        {{results[page][num]["True_date"]}}
                       </td>
                     </tr>
-
+                      {% endif %}
                     {% endif %}
                   {% endfor %}
                   </tbody>
@@ -86,15 +84,12 @@
               </div>
               <!-- END TABLE RESULT -->
 
-              <!-- BEGIN PAGINATION -->
-              <ul class="pagination">
-                <li class="disabled"><a href="#">«</a></li>
-                <li class="active"><a href="#">1</a></li>
-                <li><a href="#">2</a></li>
-                <li><a href="#">3</a></li>
-                <li><a href="#">4</a></li>
-                <li><a href="#">5</a></li>
-                <li><a href="#">»</a></li>
+              <!-- This will handle the pages at the bottom which allow us to look at more results -->
+              <ul class="pagination" style="background: rgba(255, 255, 255, 0.8)">
+                <li class="active" style="padding-left: 11px"><a href="/search/{{name}}/0">1</a></li>
+                {% for num in range(2, pages + 1): %}
+                <li><a style="padding-left: 11px" href="/search/{{name}}/{{num - 1}}">{{num}}</a></li>
+                {% endfor %}
               </ul>
               <!-- END PAGINATION -->
             </div>
