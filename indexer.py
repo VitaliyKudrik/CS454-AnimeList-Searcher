@@ -6,7 +6,7 @@ from whoosh.fields import Schema, TEXT, DATETIME, NUMERIC
 import os
 import pandas as pd
 import datetime
-
+from searcher import *
 
 """
 This indexer will read a CSV file with certain data and will then create a whoosh
@@ -52,8 +52,8 @@ def create_index():
         # Get the episode count and if there isn't one give it a big number which we will ignore in searching
         episode_count = data[i]["Episode Count"]
         if episode_count.strip() == "Unknown":
-            # Give a episode count of 0 so that we can filter it out when needed
-            episode_count = 0
+            # Give a episode count of 99999 so that we can filter it out when needed
+            episode_count = 99999
             # Used to make user experience better
             true_episode_count = "Still Airing"
         else:

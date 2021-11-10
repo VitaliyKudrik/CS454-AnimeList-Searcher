@@ -68,8 +68,6 @@ def filter_setter(data):
                 filter_reverse = False
             else:
                 filter_reverse = True
-    else:
-        curr_filter = None
 
 
 # Deal with user queries
@@ -115,6 +113,8 @@ def search(anime, page):
         filter_setter(data)
         if data.get("rank") is not None:
             no_filter = True
+            curr_filter = None
+            filter_reverse = True
         # Deal with bad user input or no input
         if user_query is not None and user_query != "":
             # Strip here just to avoid a few issues
@@ -122,7 +122,6 @@ def search(anime, page):
             if user_query != "":
                 # Send you to the anime you want to see
                 return redirect(f'/search/{user_query}/0')
-
     # If the search is empty then we set the current anime and get new results
     if current_search == "":
         current_search = anime
@@ -159,7 +158,6 @@ def search(anime, page):
     if pages > 48:
         pages = 48
     # Render the template and send the data to the page
-    print(curr_filter, filter_reverse)
     return render_template('result.html', name=anime, results=gbl_results, pages=pages, page=page, i_page=i_page,
                            curr_page_len=curr_page_len)
 

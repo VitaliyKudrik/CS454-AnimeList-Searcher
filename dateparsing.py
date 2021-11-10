@@ -22,13 +22,20 @@ def modify_date(date_data):
     # This deals with a very select few documents that are formatted strangely using spaces instead of "-"s
     elif " " in date_data:
         # This is a regex expression that removes all space characters from text.
-        clean_spaces = re.compile(r'[" ]')
-        date_data = clean_spaces.sub("", date_data)
-        date_data = date_data[0:3] + "-" + date_data[3::]
-        date_data = date_data.split("-")
-        date_data.insert(0, "1")
-        date_data[2] = date_data[2][2::].strip()
-
+        # clean_spaces = re.compile(r'[" ]')
+        # date_data = clean_spaces.sub("", date_data)
+        # date_data = date_data[0:3] + "-" + date_data[3::]
+        # date_data = date_data.split("-")
+        # date_data.insert(0, "1")
+        # date_data[2] = date_data[2][2::].strip()
+        date_data = date_data.strip()
+        date_data = date_data.split(" ")
+        if len(date_data) == 3:
+            date_data[2] = date_data[2][2::].strip()
+            if not date_data[0].isdigit():
+                date_data[0], date_data[1] = date_data[1], date_data[0]
+        elif len(date_data) == 2:
+            date_data[1] = date_data[1].strip()
     # Some anime only have a month and year for release date, so by default we will just set the day to 1
     if len(date_data) == 2:
         date_data.insert(0, "1")
@@ -36,12 +43,14 @@ def modify_date(date_data):
     date_data[0] = int(date_data[0])
     # Deal with the month
     date_data[1] = months[date_data[1]]
-
     # Deal with small issue in a few pieces of data | changes a 4 number year into last 2 digits
     if date_data[2] and len(date_data[2].strip()) > 2:
         # Remove trailing whitespace and take the last two digits of the number in string form
-        date_data[2] = str(int(date_data[2][2::].strip()))
-
+        temp = int(date_data[2][2::].strip())
+        if temp < 10:
+            date_data[2] = "0" + str(temp)
+        else:
+            date_data[2] = str(int(date_data[2][2::].strip()))
     # Deal with the year
     if int(date_data[2]) > 21:
         # Checks if the anime has a year after 21 which would imply it's from 1900's
@@ -67,12 +76,46 @@ def date_parser(my_date):
     # Data starts with a "to" followed by a year.
     # This just returns that year with a default day and month of 1,1
     if my_date[0:2] == "to":
+        my_date = my_date.strip()
+        # Remove the trailing "-"
+        if my_date[-1] == "-":
+            length = len(my_date)
+            my_date = my_date[0:length-1]
         my_date = my_date.split("-")
         # Deal with the year
-        my_date[1] = "20" + my_date[1][2::]
+        if len(my_date[1]) == 2:
+            if my_date[1].isdigit():
+                if int(my_date[1]) > 21:
+                    my_date[1] = "19" + my_date[1]
+                elif int(my_date[1]) == 0:
+                    my_date[1] = "2000"
+                else:
+                    my_date[1] = "20" + my_date[1]
+        if len(my_date) == 3:
+            if my_date[1].isdigit():
+                if int(my_date[1]) > 21:
+                    if len(my_date[1]) == 2:
+                        my_date[1] = "19" + my_date[1]
+                elif int(my_date[1]) == 0:
+                    my_date[1] = "2000"
+                else:
+                    my_date[1] = "20" + my_date[1]
+            if my_date[2].isdigit():
+                if int(my_date[2]) > 21:
+                    if len(my_date[1]) == 2:
+                        my_date[2] = "19" + my_date[2]
+                elif int(my_date[2]) == 0:
+                    my_date[2] = "2000"
+                else:
+                    my_date[2] = "20" + my_date[2]
+                return [int(my_date[1]), 1, 1], [int(my_date[2]), 1, 1]
+            else:
+                # Deal with ? in broken data
+                return [int(my_date[1]), 1, 1], [9999, 12, 31]
         # If the year is "00" then we are in the year 2000
-        if int(my_date[1]) == 0:
-            my_date[1] = "2000"
+        if my_date[1].isdigit():
+            if int(my_date[1]) == 0:
+                my_date[1] = "2000"
         return [int(my_date[1]), 1, 1], [int(my_date[1]), 1, 1]
 
     # Deal with date formats like 11-Mar, Mar-11, 2-Mar, Mar-2
@@ -84,12 +127,12 @@ def date_parser(my_date):
         # Check for years before the 2000's
         if int(date_data[0]) > 21:
             date_data[0] = '19' + date_data[0]
-        # If it's a single digit number then it's from the year 2000
-        elif len(date_data[0]) == 1:
-            date_data[0] = "200" + date_data[0]
-        # Not sure if this was necessary [probably not], keeping just in case. Doesn't hurt having it.
-        elif len(date_data[1]) == 1:
-            date_data[1] = "200" + date_data[1]
+        elif int(date_data[0]) < 21:
+            if len(date_data[0]) == 1:
+                date_data[0] = "200" + date_data[0]
+            else:
+                date_data[0] = '20' + date_data[0]
+
         # If the year is "00" then we are in the year 2000
         if int(date_data[0]) == 0:
             date_data[0] = '2000'
@@ -125,6 +168,12 @@ def date_parser(my_date):
     else:
         # Otherwise we just put 1 date into the array
         dates = [my_date]
+    if len(dates) == 2:
+        dates[0] = dates[0].strip()
+        dates[1] = dates[1].strip()
+    else:
+        dates[0] = dates[0].strip()
+
     try:
         # Deal with the first date
         date_data = modify_date(dates[0])
