@@ -31,17 +31,58 @@ def global_anime_creator(results):
         temp = []
 
 
+# This is just a helper function for cleaner code. It sets the filters for post results filtering
+def filter_setter(data):
+    global filter_reverse
+    global curr_filter
+
+    # Find the filter
+    f_rating = data.get('rating')
+    f_episodes = data.get('episodes')
+    f_air_date = data.get('air_date')
+    # Set the current filter
+    if f_rating:
+        if curr_filter != 'rating':
+            curr_filter = "rating"
+            filter_reverse = True
+        else:
+            if filter_reverse:
+                filter_reverse = False
+            else:
+                filter_reverse = True
+    elif f_episodes:
+        if curr_filter != 'episodes':
+            curr_filter = "episodes"
+            filter_reverse = True
+        else:
+            if filter_reverse:
+                filter_reverse = False
+            else:
+                filter_reverse = True
+    elif f_air_date:
+        if curr_filter != 'air_date':
+            curr_filter = "air_date"
+            filter_reverse = True
+        else:
+            if filter_reverse:
+                filter_reverse = False
+            else:
+                filter_reverse = True
+    else:
+        curr_filter = None
+
+
 # Deal with user queries
 @app.route('/', methods=['GET'])
 def homepage():
     if request.method == 'GET':
         data = request.args
-        x = data.get('search')
+        user_query = data.get('search')
         # Deal with bad user input or no input
-        if x is not None and x != "":
-            x = x.strip()
+        if user_query is not None and user_query != "":
+            user_query = user_query.strip()
             # Send you to the anime you want to see
-            return redirect(f'/search/{x}/0')
+            return redirect(f'/search/{user_query}/0')
 
     return render_template('/index.html')
 
@@ -50,24 +91,37 @@ def homepage():
 current_search = ""
 gbl_results = {}
 
+curr_filter = None
+filter_reverse = True
+
 
 # Show the actual anime results. Hasn't been made presentable yet
 @app.route('/search/<anime>/<page>', methods=['GET'])
 def search(anime, page):
     global current_search
     global gbl_results
+    global curr_filter
+    global filter_reverse
+
+    # This is for the rank button
+    no_filter = False
 
     # If the user submits a new query we handle it here
     if request.method == 'GET':
         data = request.args
-        x = data.get('search')
+        print(data)
+        user_query = data.get('search')
+        # This will set the global variables for filters
+        filter_setter(data)
+        if data.get("rank") is not None:
+            no_filter = True
         # Deal with bad user input or no input
-        if x is not None and x != "":
+        if user_query is not None and user_query != "":
             # Strip here just to avoid a few issues
-            x = x.strip()
-            if x != "":
+            user_query = user_query.strip()
+            if user_query != "":
                 # Send you to the anime you want to see
-                return redirect(f'/search/{x}/0')
+                return redirect(f'/search/{user_query}/0')
 
     # If the search is empty then we set the current anime and get new results
     if current_search == "":
@@ -76,7 +130,13 @@ def search(anime, page):
         global_anime_creator(results)
     # If we are on the same query and looking at different pages then don't recalculate
     elif current_search == anime:
-        pass
+        if curr_filter is not None and no_filter is False:
+            results = anime_searcher(anime, curr_filter, filter_reverse)
+            global_anime_creator(results)
+        else:
+            results = anime_searcher(anime)
+            global_anime_creator(results)
+
     # If the search isn't empty, but we have a new query then we set the current anime and get new results
     else:
         current_search = anime
@@ -99,11 +159,10 @@ def search(anime, page):
     if pages > 48:
         pages = 48
     # Render the template and send the data to the page
+    print(curr_filter, filter_reverse)
     return render_template('result.html', name=anime, results=gbl_results, pages=pages, page=page, i_page=i_page,
                            curr_page_len=curr_page_len)
 
 
 if __name__ == "__main__":
     app.run(debug=True)
-
-

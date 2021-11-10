@@ -1,4 +1,4 @@
-from whoosh import qparser
+from whoosh import qparser, sorting
 from whoosh.qparser import MultifieldParser, FuzzyTermPlugin
 from whoosh.index import open_dir
 import pandas as pd
@@ -22,7 +22,7 @@ def read_file(dataFile):
 
 
 # This searches for the user provided query and prints results_limit amount of results
-def anime_searcher(user_query):
+def anime_searcher(user_query, my_filter="", is_reverse=False):
     # Change this number if you want more results
     results_limit = 9999
     # These are for the user to pick from when choosing OR queries or AND queries
@@ -54,11 +54,33 @@ def anime_searcher(user_query):
         # # restrict_q = Term("Title", "")
         # # allow_q = Term("Title", "")
 
+        # Facet which will sort data by rating, the numeric rating didn't work so we are using True_rating
+        rating_facet = sorting.FieldFacet('True_rating')
+        # Facet which will sort data by episode count
+        episode_facet = sorting.FieldFacet('EpisodeCount')
+        # Facet which will sort data by date
+        date_facet = sorting.FieldFacet('Begin_date')
         # Parse the question
         user_question = multiparser.parse(question_str)
-        # Search the question
-        results = searcher.search(user_question, limit=results_limit)
-
+        # Search the question and check for filtering
+        if my_filter == "rating":
+            # If is_reverse is true then we reverse the results
+            if is_reverse:
+                results = searcher.search(user_question, limit=results_limit, sortedby=rating_facet, reverse=True)
+            else:
+                results = searcher.search(user_question, limit=results_limit, sortedby=rating_facet, reverse=False)
+        elif my_filter == "air_date":
+            if is_reverse:
+                results = searcher.search(user_question, limit=results_limit, sortedby=date_facet, reverse=True)
+            else:
+                results = searcher.search(user_question, limit=results_limit, sortedby=date_facet, reverse=False)
+        elif my_filter == "episodes":
+            if is_reverse:
+                results = searcher.search(user_question, limit=results_limit, sortedby=episode_facet, reverse=True)
+            else:
+                results = searcher.search(user_question, limit=results_limit, sortedby=episode_facet, reverse=False)
+        else:
+            results = searcher.search(user_question, limit=results_limit)
         # Holder for all the anime we will find
         return_this = []
         # Counter to make sure we loop properly
