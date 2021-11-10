@@ -13,24 +13,39 @@
 <body id="background_pic">
 <div class="container">
   <div class="row">
+
     <!-- BEGIN SEARCH RESULT -->
     <div class="col-md-12">
       <div class="grid search">
+
         <div class="grid-body">
+
             <!-- BEGIN RESULT -->
             <div class="col" style="background: rgba(255, 255, 255, 0.5)">
+                <div class="input-group-sm">
+                  <button type="submit" class="text-dark btn btn-link" style="height: 35px;">
+                      <a href="../../" style="color: black; font-size: 25px; font-family: Harrington"> Anime Searcher Homepage </a></button>
+              </div>
               <h2 style="padding-left: 15px; font-family: Harrington;font-weight: bold; text-align: center;
               font-size: xxx-large;">
-                <i class="fa fa-file-o">Results for {{name}}</i>
+                <i class="fa fa-file-o" style="word-wrap: break-word">Results for {{name}}</i>
               </h2>
 
               <!-- BEGIN SEARCH INPUT -->
-              <div class="input-group">
-                <input type="text" class="form-control" placeholder="Anime keywords | example: Attack on Titan">
-                <span class="input-group-btn">
-                  <button class="btn btn-primary" type="button"><i class="fa fa-search"></i>Search</button>
-                </span>
-              </div>
+              <!-- Form -->
+            <form method="get" autocomplete="off">
+                <!-- Main Search Bar -->
+                <div class="p-2 bg-white rounded rounded-pill shadow-sm">
+                    <div class="input-group">
+                        <input type="text" id="search" name="search" placeholder="Anime keywords | example: Attack on Titan"
+                               class="border-0 form-control bg-white;" style="text-align: center; height: 35px">
+
+                        <div class="input-group-sm">
+                            <button id="button-addon1"  type="submit" class="text-dark btn btn-link" style="height: 35px"><i value="Search"></i>Search</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
               <!-- END SEARCH INPUT -->
 
               <div class="padding"></div>
@@ -54,17 +69,24 @@
                     <td>Title </td>
                     <td>Description </td>
                     <td>Rating </td>
+                    <td>Episodes</td>
                     <td>Air Date </td>
                   </tr>
                   <!-- For loop to make top 10 anime show up -->
-                  {% for num in range(0, curr_page_len): %}
-                    {% if results|length > num: %}
+                  {% if pages > i_page %}
+                    {% for num in range(0, curr_page_len): %}
                       {% if pages > i_page: %}
                     <tr>
                         <!-- This shows the rank of the anime -->
                         <td class="number text-center">{{(i_page)*10 + num + 1}}</td>
                         <!-- This shows the image of the anime -->
-                        <td class="image"><img src="{{results[page][num]['Picture']}}" alt="" height="200" width="150"></td>
+                        <!-- This will show a default page if the anime didn't have a picture -->
+                        {% if results[page][num]['Picture'] == "No_IMG_Found.png" %}
+                            <td class="image"><img src="/static/images/No_IMG_Found.png" alt="" height="200" width="300"></td>
+                        {% else %}
+                            <td class="image"><img src="{{results[page][num]['Picture']}}" alt="" height="200" width="150"></td>
+                        {% endif  %}
+
                         <!-- This shows the title of the anime -->
                         <td class="product"><a href='{{results[page][num]["Link"]}}'>{{results[page][num]['True_title']}}</a> </td>
                         <!-- This shows the description of the anime -->
@@ -72,18 +94,26 @@
                       <td class="borderClass ac bgColor0" width="80">
                         {{results[page][num]['True_rating']}}
                       </td>
+                      <td class="borderClass ac bgColor0" width="80">
+                        {{results[page][num]['True_episode_count']}}
+                      </td>
                       <td class="borderClass ac bgColor0" width="120">
                         {{results[page][num]["True_date"]}}
                       </td>
                     </tr>
                       {% endif %}
-                    {% endif %}
-                  {% endfor %}
+                    {% endfor %}
+                  {% endif %}
                   </tbody>
                 </table>
               </div>
               <!-- END TABLE RESULT -->
+              {% if pages == 0 %}
+                {% if curr_page_len == 0 %}
+                    <h1 style="background: rgba(255, 50, 50, 0.7); text-align: center;">There were no results for the query: {{name}} </h1>
 
+                {% endif %}
+              {% endif %}
               <!-- This will handle the pages at the bottom which allow us to look at more results -->
               <ul class="pagination" style="background: rgba(255, 255, 255, 0.8)">
                 <li class="active" style="padding-left: 11px"><a href="/search/{{name}}/0">1</a></li>
