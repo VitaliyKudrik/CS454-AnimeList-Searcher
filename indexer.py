@@ -6,7 +6,7 @@ from whoosh.fields import Schema, TEXT, DATETIME, NUMERIC
 import os
 import pandas as pd
 import datetime
-from collections import defaultdict
+
 
 """
 This indexer will read a CSV file with certain data and will then create a whoosh
@@ -16,7 +16,8 @@ By: Vitaliy Kudrik
 
 # This is for the true date, just to make user experience better
 inverse_months = {1: "Jan", 2: "Feb", 3: "Mar", 4: "Apr", 5: "May", 6: "Jun", 7: "Jul",
-          8: "Aug", 9: "Sep", 10: "Oct", 11: "Nov", 12: "Dec"}
+                  8: "Aug", 9: "Sep", 10: "Oct", 11: "Nov", 12: "Dec"}
+
 
 # This just opens the csv file for reading when creating the index.
 def read_file(dataFile):
@@ -51,8 +52,8 @@ def create_index():
         # Get the episode count and if there isn't one give it a big number which we will ignore in searching
         episode_count = data[i]["Episode Count"]
         if episode_count.strip() == "Unknown":
-            # Give a episode count of 99999 so that we can filter it out when needed
-            episode_count = 99999
+            # Give a episode count of 0 so that we can filter it out when needed
+            episode_count = 0
             # Used to make user experience better
             true_episode_count = "Still Airing"
         else:
@@ -65,8 +66,8 @@ def create_index():
         anime_rating = data[i]["Rating"]
         # Because an empty field is a float for some reason, we check for nan using nan != nan
         if anime_rating != anime_rating:
-            # Give a rating of 99999 so that we can filter it out when needed
-            anime_rating = 99999
+            # Give a rating of 0 so that we can filter it out when needed
+            anime_rating = 0
             true_rating = "Unrated"
         else:
             # Used to make user experience better
@@ -81,6 +82,8 @@ def create_index():
 
         # Check if the anime has genres since a select few small specials don't have genres
         anime_genres = data[i]["Genres"]
+        # Initialize search genres
+        search_genres = ""
         # Because an empty field is a float for some reason we check for nan using nan != nan
         if anime_genres != anime_genres:
             # Since there were no producers we just write that there isn't any
@@ -106,20 +109,23 @@ def create_index():
         true_end = "-".join(true_end)
 
         # Deal with movies and one offs that start and end same day
-        if begin_date == end_date:
-            if true_begin == '12-31-9999':
-                true_date = 'Date TBA'
-            else:
-                true_date = true_begin
-        # Deal with anime that is still ongoing
-        elif true_end == '12-31-9999':
-            true_date = true_begin + " - ?"
-        # Deal with anime that hasn't begun
-        elif true_date == '12-31-9999':
-            true_date = "?"
-        # Deal with anime that have both begin and end dates
+        if begin_date == "Not available":
+            true_date = "Not available"
         else:
-            true_date = true_begin + " - " + true_end
+            if begin_date == end_date:
+                if true_begin == 'Dec-31-9999':
+                    true_date = 'Date TBA'
+                else:
+                    true_date = true_begin
+            # Deal with anime that is still ongoing
+            elif true_end == 'Dec-31-9999':
+                true_date = true_begin + " - ?"
+            # Deal with anime that hasn't begun
+            elif true_date == 'Dec-31-9999':
+                true_date = "?"
+            # Deal with anime that have both begin and end dates
+            else:
+                true_date = true_begin + " - " + true_end
         # The searchable title of the anime will be lowercase but presented anime title will be normal case
         lower_title = data[i]["Title"].lower()
 

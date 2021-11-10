@@ -32,7 +32,6 @@ def modify_date(date_data):
     # Some anime only have a month and year for release date, so by default we will just set the day to 1
     if len(date_data) == 2:
         date_data.insert(0, "1")
-
     # Deal with the day
     date_data[0] = int(date_data[0])
     # Deal with the month
@@ -82,11 +81,14 @@ def date_parser(my_date):
         # Switch the months around because there is sometimes 11-Mar and sometimes Mar-11
         if len(date_data[0]) == 3:
             date_data[0], date_data[1] = date_data[1], date_data[0]
+        # Check for years before the 2000's
+        if int(date_data[0]) > 21:
+            date_data[0] = '19' + date_data[0]
         # If it's a single digit number then it's from the year 2000
-        if len(date_data[0]) == 1:
+        elif len(date_data[0]) == 1:
             date_data[0] = "200" + date_data[0]
         # Not sure if this was necessary [probably not], keeping just in case. Doesn't hurt having it.
-        if len(date_data[1]) == 1:
+        elif len(date_data[1]) == 1:
             date_data[1] = "200" + date_data[1]
         # If the year is "00" then we are in the year 2000
         if int(date_data[0]) == 0:
@@ -116,7 +118,6 @@ def date_parser(my_date):
     # If we found a comma then we make sure to make our date back into a string
     if found:
         my_date = " ".join(comma_check)
-
     # Check if we have two dates
     if "to" in my_date:
         # If we do then we split it on the "to" and we will have two dates in our array
