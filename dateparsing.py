@@ -4,14 +4,15 @@ Modifying the dates was kind of a messy process because some of the scraped data
 wasn't very clean for some reason. Possibly due to inconsistency on their record keeping and my scraping.
 """
 
-import re
-
 months = {"Jan": 1, "Feb": 2, "Mar": 3, "Apr": 4, "May": 5, "Jun": 6, "Jul": 7,
           "Aug": 8, "Sep": 9, "Oct": 10, "Nov": 11, "Dec": 12}
 
 
 # This is a helper function for the date_parser
 def modify_date(date_data):
+    # This is a small bug fix for years beyond 2021 that I didn't account for
+    fix = False
+    temp_year = "9999"
     # Base case for only a year in the date_data
     if len(date_data.strip()) == 4:
         return [int(date_data), 1, 1]
@@ -21,13 +22,6 @@ def modify_date(date_data):
         date_data = date_data.split("-")
     # This deals with a very select few documents that are formatted strangely using spaces instead of "-"s
     elif " " in date_data:
-        # This is a regex expression that removes all space characters from text.
-        # clean_spaces = re.compile(r'[" ]')
-        # date_data = clean_spaces.sub("", date_data)
-        # date_data = date_data[0:3] + "-" + date_data[3::]
-        # date_data = date_data.split("-")
-        # date_data.insert(0, "1")
-        # date_data[2] = date_data[2][2::].strip()
         date_data = date_data.strip()
         date_data = date_data.split(" ")
         if len(date_data) == 3:
@@ -45,6 +39,11 @@ def modify_date(date_data):
     date_data[1] = months[date_data[1]]
     # Deal with small issue in a few pieces of data | changes a 4 number year into last 2 digits
     if date_data[2] and len(date_data[2].strip()) > 2:
+        if date_data[2].isdigit():
+            if int(date_data[2]) > 2021:
+                temp_year = int(date_data[2])
+                # Set the flag to true so that we can exchange the year when needed.
+                fix = True
         # Remove trailing whitespace and take the last two digits of the number in string form
         temp = int(date_data[2][2::].strip())
         if temp < 10:
@@ -60,6 +59,8 @@ def modify_date(date_data):
         date_data[2] = "20" + date_data[2]
     # Make the year into int
     date_data[2] = int(date_data[2].strip())
+    if fix:
+        date_data[2] = temp_year
     # Switch the year and the day to fit the daytime format
     date_data[0], date_data[2] = date_data[2], date_data[0]
     # Return the new date formatted
@@ -173,7 +174,6 @@ def date_parser(my_date):
         dates[1] = dates[1].strip()
     else:
         dates[0] = dates[0].strip()
-
     try:
         # Deal with the first date
         date_data = modify_date(dates[0])
@@ -192,7 +192,6 @@ def date_parser(my_date):
                 return [int(date_data[0]), months[date_data[1]], 1], [9999, 12, 31]
             # Otherwise the dates are the same and we return them
             return [int(date_data[0]), months[date_data[1]], 1], [int(date_data[0]), months[date_data[1]], 1]
-
     # Deal with second date
     if len(dates) == 2:
         # If anime is on going then we give it the date with the year 9999

@@ -6,7 +6,7 @@ from whoosh.fields import Schema, TEXT, DATETIME, NUMERIC
 import os
 import pandas as pd
 import datetime
-from searcher import *
+
 
 """
 This indexer will read a CSV file with certain data and will then create a whoosh
