@@ -88,7 +88,7 @@ def homepage():
 # Global value to keep track of current searching
 current_search = ""
 gbl_results = {}
-
+# Current filter settings
 curr_filter = None
 filter_reverse = True
 
@@ -107,7 +107,7 @@ def search(anime, page):
     # If the user submits a new query we handle it here
     if request.method == 'GET':
         data = request.args
-        print(data)
+        #print(data)
         user_query = data.get('search')
         # This will set the global variables for filters
         filter_setter(data)
