@@ -82,7 +82,7 @@ def homepage():
             # Send you to the anime you want to see
             return redirect(f'/search/{user_query}/0')
 
-    return render_template('/index.html')
+    return render_template('index.html')
 
 
 # Global value to keep track of current searching
@@ -91,23 +91,24 @@ gbl_results = {}
 # Current filter settings
 curr_filter = None
 filter_reverse = True
+# Description toggle
+desc = 1
 
 
 # Show the actual anime results. Hasn't been made presentable yet
-@app.route('/search/<anime>/<page>', methods=['GET'])
+@app.route('/search/<anime>/<page>', methods=['GET', 'POST'])
 def search(anime, page):
     global current_search
     global gbl_results
     global curr_filter
     global filter_reverse
+    global desc
 
     # This is for the rank button
     no_filter = False
 
-    # If the user submits a new query we handle it here
     if request.method == 'GET':
         data = request.args
-        #print(data)
         user_query = data.get('search')
         # This will set the global variables for filters
         filter_setter(data)
@@ -122,6 +123,11 @@ def search(anime, page):
             if user_query != "":
                 # Send you to the anime you want to see
                 return redirect(f'/search/{user_query}/0')
+        if data.get("desc") is not None:
+            if desc:
+                desc = 0
+            else:
+                desc = 1
     # If the search is empty then we set the current anime and get new results
     if current_search == "":
         current_search = anime
@@ -154,12 +160,28 @@ def search(anime, page):
             # Set the values for the html page to see
             curr_page_len = len(gbl_results[page])
             i_page = int(page)
-    # I don't think we need more than 48 pages, and it also fits perfectly in our results if there are 48.
-    if pages > 48:
-        pages = 48
+
+    begin_page = i_page
+    end_page = int(pages)
+    total_pages = int(pages)
+    if begin_page - 5 <= 0:
+        begin_page = 0
+        if end_page > 10:
+            end_page = 10
+    elif abs(begin_page - end_page) < 5:
+        begin_page = end_page - 10
+        end_page = end_page
+    else:
+        if begin_page + 5 > total_pages:
+            end_page = total_pages
+        else:
+            end_page = begin_page + 5
+        begin_page = begin_page - 5
+
+    # print("pages = {} \t page = {} \t i_page = {} \t curr_page_len = {}".format(pages, page, i_page, curr_page_len))
     # Render the template and send the data to the page
     return render_template('result.html', name=anime, results=gbl_results, pages=pages, page=page, i_page=i_page,
-                           curr_page_len=curr_page_len)
+                           curr_page_len=curr_page_len, begin_page=begin_page, end_page=end_page, desc=desc)
 
 
 if __name__ == "__main__":

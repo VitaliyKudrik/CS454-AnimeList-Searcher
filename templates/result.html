@@ -1,5 +1,14 @@
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+
+    <title>Page {{page}} | {{name}}</title>
+</head>
+
 <style>
     #background_pic {
     background: url("/static/images/results_bg1.jpg") no-repeat fixed;
@@ -9,6 +18,8 @@
     background-size: cover;
     }
 </style>
+
+
 <body id="background_pic">
     <div class="container">
         <div class="row">
@@ -20,9 +31,9 @@
                         <div class="col" style="background: rgba(255, 255, 255, 0.5)">
                             <div class="input-group-sm">
                                 <button type="submit" class="text-dark btn btn-link" style="height: 35px;">
-                                <a href="../../" style="color: black; font-size: 25px; font-family: Harrington"> Anime Searcher Homepage </a></button>
+                                <a href="../../" style="color: black; font-size: 25px; font-family: Malgun Gothic,sans-serif">Homepage </a></button>
                             </div>
-                            <h2 style="padding-left: 15px; font-family: Harrington;font-weight: bold; text-align: center;
+                            <h2 style="padding-left: 15px; font-family: 'Malgun Gothic',sans-serif;font-weight: bold; text-align: center;
                                 font-size: xxx-large;">
                                 <i class="fa fa-file-o" style="word-wrap: break-word">Results for {{name}}</i>
                             </h2>
@@ -54,12 +65,12 @@
                             <table class="table table-hover">
                                 <!-- The reason I used the btn class for just normal text is because I couldn't get the text to match
                                     up otherwise. So I decided to just use the btn class for all my text in this section.-->
-                                <tr style="font-weight: bold;font-family: 'Californian FB';">
+                                <tr style="font-weight: bold;font-family: 'Malgun Gothic',sans-serif;">
                                     <td>
                                         <!-- If you click on rank then it will give you normal results without filtering-->
                                         <form method="get">
                                             <button type="submit" class="text-dark btn btn-link" name="rank" value="Rank"
-                                                style="font-weight: bold; height: 0px; box-shadow: none; text-decoration: none;">Rank</button>
+                                                style="font-weight: bold; height: 0; box-shadow: none; text-decoration: none;">Rank</button>
                                         </form>
                                     </td>
                                     <td>
@@ -111,9 +122,9 @@
                                     <!-- This shows the image of the anime -->
                                     <!-- This will show a default page if the anime didn't have a picture -->
                                     {% if results[page][num]['Picture'] == "No_IMG_Found.png" %}
-                                    <td class="image"><img src="/static/images/No_IMG_Found.png" alt="" height="200" width="300"></td>
+                                    <td class="image"><img src="/static/images/No_IMG_Found.png" alt="" height="200" width="150"></td>
                                     {% else %}
-                                    <td class="image"><img src="{{results[page][num]['Picture']}}" alt="" height="200" width="150"></td>
+                                    <td class="image"><img src="{{results[page][num]['Picture']}}" alt="" height="200" width="150" onerror="this.src='/static/images/No_IMG_Found.png'"></td>
                                     {% endif  %}
                                     <!-- This shows the title of the anime -->
                                     <td class="product">
@@ -122,7 +133,25 @@
                                         </a>
                                     </td>
                                     <!-- This shows the description of the anime -->
-                                    <td class="pt4">{{results[page][num]["True_description"]}}</td>
+
+                                    <td class="borderClass ac bgColor0" style="font-family: 'Malgun Gothic',sans-serif;">
+                                        {% if desc == 1 %}
+                                        <form method="get">
+                                            <button type="submit" class="text-dark btn btn-link" name="desc" value="Desc"
+                                                style="box-shadow: none; text-decoration: none; text-align: left; width: 600px; max-height: 50px;">
+                                                {{results[page][num]["True_description"][0:450]}}...
+                                            </button>
+                                        </form>
+                                        {% else %}
+                                        <form method="get">
+                                            <button type="submit" class="text-dark btn btn-link" name="desc" value="Desc"
+                                                style="box-shadow: none; text-decoration: none; text-align: left; width: 600px;">
+                                                {{results[page][num]["True_description"]}}
+                                            </button>
+                                        </form>
+                                        {% endif %}
+
+                                    </td>
                                     <td class="borderClass ac bgColor0" width="80">
                                         {{results[page][num]['True_rating']}}
                                     </td>
@@ -142,15 +171,33 @@
                         <!-- END TABLE RESULT -->
                         {% if pages == 0 %}
                         {% if curr_page_len == 0 %}
-                        <h1 style="background: rgba(255, 50, 50, 0.7); text-align: center;">There were no results for the query: {{name}} </h1>
+                        <h1 style="background: rgba(255, 50, 50, 0.7); text-align: center;"><i class="fa fa-file-o" style="word-wrap: break-word">There were no results for the query: {{name}} </i></h1>
                         {% endif %}
                         {% endif %}
                         <!-- This will handle the pages at the bottom which allow us to look at more results -->
-                        <ul class="pagination" style="background: rgba(255, 255, 255, 0.8)">
-                            <li class="active" style="padding-left: 11px"><a href="/search/{{name}}/0">1</a></li>
-                            {% for num in range(2, pages + 1): %}
-                            <li><a style="padding-left: 11px" href="/search/{{name}}/{{num - 1}}">{{num}}</a></li>
+                        <ul class="pagination justify-content-center" style="background: rgba(255, 255, 255, 0.8); font-family: 'Deja Vu Sans Mono'; font-size: 25px; letter-spacing: 0.05em; padding-bottom: 10px">
+                            <button class="btn btn-light btn-outline-info"><a style="padding-left: 11px; padding-right: 11px; text-decoration: none; font-size: 25px" href="/search/{{name}}/0">Start</a></button>
+                            {% if i_page == 0 %}
+                            <button class="btn btn-light btn-outline-info" disabled><a style="padding-left: 11px; padding-right: 11px; text-decoration: none; font-size: 25px; color: red;" href="/search/{{name}}/0">Prev</a></button>
+                            {% else %}
+                            <button class="btn btn-light btn-outline-info"><a style="padding-left: 11px; padding-right: 11px; text-decoration: none; font-size: 25px;" href="/search/{{name}}/{{i_page - 1}}">Prev</a></button>
+                            {% endif %}
+                            <!-- For loop for buttons -->
+                            {% for num in range(begin_page, end_page): %}
+                            {% if i_page == num %}
+                                <button class="btn btn-info btn-outline-dark"><a style="padding-left: 11px; padding-right: 11px; text-decoration: none; font-size: 25px;" href="/search/{{name}}/{{num}}">{{num + 1}}</a></button>
+                            {% else %}
+                                <button class="btn btn-light btn-outline-info"><a style="padding-left: 11px; padding-right: 11px; text-decoration: none; font-size: 25px" href="/search/{{name}}/{{num}}">{{num + 1}}</a></button>
+
+                            {% endif %}
                             {% endfor %}
+
+                            {% if i_page == pages - 1 %}
+                            <button class="btn btn-light btn-outline-info" disabled><a style="padding-left: 11px; padding-right: 11px; text-decoration: none; font-size: 25px; color: red;" href="">Next</a></button>
+                            {% else %}
+                            <button class="btn btn-light btn-outline-info"><a style="padding-left: 11px; padding-right: 11px; text-decoration: none; font-size: 25px;" href="/search/{{name}}/{{i_page + 1}}">Next</a></button>
+                            {% endif %}
+                            <button class="btn btn-light btn-outline-info"><a style="padding-left: 11px; padding-right: 11px; text-decoration: none; font-size: 25px" href="/search/{{name}}/{{pages - 1}}">End</a></button>
                         </ul>
                         <!-- END PAGINATION -->
                     </div>
@@ -159,7 +206,6 @@
             </div>
         </div>
     </div>
-    <!-- END SEARCH RESULT -->
-    </div>
-    </div>
+        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js" integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous"></script>
 </body>
