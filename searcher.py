@@ -1,5 +1,5 @@
-from whoosh import qparser, sorting, query
-from whoosh.qparser import MultifieldParser, FuzzyTermPlugin, QueryParser
+from whoosh import qparser, sorting
+from whoosh.qparser import MultifieldParser, FuzzyTermPlugin
 from whoosh.index import open_dir
 import pandas as pd
 
@@ -33,7 +33,7 @@ def anime_searcher(user_query, my_filter="", is_reverse=False):
     results_limit = 9999
     # These are for the user to pick from when choosing OR queries or AND queries
     disjunctive = qparser.OrGroup
-    conjunctive = qparser.AndGroup
+    # conjunctive = qparser.AndGroup
 
     # Open the index
     ix = open_dir("index")
@@ -50,10 +50,7 @@ def anime_searcher(user_query, my_filter="", is_reverse=False):
         multiparser.add_plugin(qparser.GtLtPlugin)
         multiparser.remove_plugin_class(qparser.WildcardPlugin)
         # These are ways to restrict certain results or to filter for certain results, not used here for now
-        # restrict_q = query.Term("Genres", ggenres)
         # allow_q = Term("Title", "")
-        #restrict_q = query.Term("Genres", "mecha, action")
-        #restrict_q = query.Phrase("Genres", "mecha action")
 
         # Facet which will sort data by rating, the numeric rating didn't work so we are using True_rating
         rating_facet = sorting.FieldFacet('True_rating')
@@ -96,9 +93,7 @@ def anime_searcher(user_query, my_filter="", is_reverse=False):
             counter += 1
             results_counter -= 1
         # Return the list of anime
-        print(my_filter, results.runtime)
         return return_this
-
 
 # x = anime_searcher("Action Vampire Romance")
 # for anime in x:
