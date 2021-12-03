@@ -16,7 +16,7 @@ genres = ["action", "adventure", "avant garde", "award winning", "boys love", "c
           "suspense", "work life", "ecchi", "cars", "demons", "game", "harem", "historical", "martial arts", "mecha",
           "military", "music", "parody", "police", "psychological", "samurai", "school", "space", "super power",
           "vampire", "josei", "kids", "seinen", "shoujo", "shounen"]
-
+upper_genres = [x.title() for x in genres]
 
 # This just opens the csv file for reading when creating the index.
 def read_file(dataFile):

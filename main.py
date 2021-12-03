@@ -1,6 +1,6 @@
 from flask import Flask
 from flask import render_template, request, redirect
-from searcher import anime_searcher
+from searcher import anime_searcher, upper_genres
 from math import ceil
 
 app = Flask(__name__)
@@ -76,13 +76,21 @@ def homepage():
     if request.method == 'GET':
         data = request.args
         user_query = data.get('search')
+        for thing in data:
+            my_field = data.get(thing)
+            if thing != "genre_holder[]":
+                if my_field is not None and my_field != "":
+                    print(thing, my_field)
+        # These are the genres from the check box
+        adv_genres = data.getlist('genre_holder[]')
+        print(adv_genres)
+        
         # Deal with bad user input or no input
         if user_query is not None and user_query != "":
             user_query = user_query.strip()
             # Send you to the anime you want to see
-            return redirect(f'/search/{user_query}/0')
-
-    return render_template('index.html')
+            #return redirect(f'/search/{user_query}/0')
+    return render_template('index.html', genres=upper_genres, len_genres=len(upper_genres))
 
 
 # Global value to keep track of current searching
@@ -160,7 +168,7 @@ def search(anime, page):
             # Set the values for the html page to see
             curr_page_len = len(gbl_results[page])
             i_page = int(page)
-
+    # Pagination
     begin_page = i_page
     end_page = int(pages)
     total_pages = int(pages)
