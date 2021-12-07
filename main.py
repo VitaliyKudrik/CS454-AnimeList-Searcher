@@ -89,7 +89,7 @@ def homepage():
         if user_query is not None and user_query != "":
             user_query = user_query.strip()
             # Send you to the anime you want to see
-            #return redirect(f'/search/{user_query}/0')
+            return redirect(f'/search/{user_query}/0')
     return render_template('index.html', genres=upper_genres, len_genres=len(upper_genres))
 
 
